@@ -1,17 +1,16 @@
 import tkinter as tk
 from tkinter import *
-from tkinter import messagebox
+from tkinter.ttk import Combobox
 from experta import *
 import random
 
 root = tk.Tk()  # create root window
-root.iconphoto(False, tk.PhotoImage(file='/home/ameni/jobTitle_recommendation/icons/Job.png'))
+root.iconphoto(False, tk.PhotoImage(file='D:\Bureau\professionrecom\jobTitle_recommendation\icons\Job.png'))
 
 jobResult = ""
 skills = StringVar()
 interests = StringVar()
 academic_field = StringVar()
-
 
 class JobRecommendation(KnowledgeEngine):
     @DefFacts()
@@ -19,24 +18,22 @@ class JobRecommendation(KnowledgeEngine):
         yield Fact(action="find_job")
 
     # ************ FACTS *******************
-    
-    # Skills (e.g., Python, Leadership, Management)
+
     @Rule(Fact(action='find_job'), NOT(Fact(skills=W())), salience=1)
     def jobSkills(self):
         self.declare(Fact(skills=skills.get()))  # first
 
-    # Interests (e.g., Software Development, Data Science, Marketing)
     @Rule(Fact(action='find_job'), NOT(Fact(interests=W())), salience=1)
     def jobInterests(self):
         self.declare(Fact(interests=interests.get()))
 
-    # Academic field (e.g., Computer Science, Business, Medicine)
     @Rule(Fact(action='find_job'), NOT(Fact(academic_field=W())), salience=1)
     def jobAcademicField(self):
         self.declare(Fact(academic_field=academic_field.get()))
 
     # ************ RULES *******************
 
+    # Example professions
     @Rule(Fact(action='find_job'), Fact(skills="Python"), Fact(interests="Software Development"))
     def r1(self):
         self.declare(Fact(jobTitle="Software Developer"))
@@ -49,6 +46,36 @@ class JobRecommendation(KnowledgeEngine):
     def r3(self):
         self.declare(Fact(jobTitle="Data Scientist"))
 
+    @Rule(Fact(action='find_job'), Fact(skills="Java"), Fact(interests="Backend Development"))
+    def r4(self):
+        self.declare(Fact(jobTitle="Backend Developer"))
+
+    # Additional rules for new professions
+    @Rule(Fact(action='find_job'), Fact(skills="Cloud Computing"), Fact(interests="Cloud Engineering"))
+    def r5(self):
+        self.declare(Fact(jobTitle="Cloud Engineer"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="Cybersecurity"), Fact(interests="Cybersecurity"))
+    def r6(self):
+        self.declare(Fact(jobTitle="Cybersecurity Analyst"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="Embedded Systems"), Fact(interests="Embedded Engineering"))
+    def r7(self):
+        self.declare(Fact(jobTitle="Embedded Engineer"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="Network Security"), Fact(interests="Cybersecurity"))
+    def r8(self):
+        self.declare(Fact(jobTitle="Network Security Engineer"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="AWS"), Fact(interests="Cloud Engineering"))
+    def r9(self):
+        self.declare(Fact(jobTitle="Cloud Solutions Architect"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="C++"), Fact(interests="Embedded Engineering"))
+    def r10(self):
+        self.declare(Fact(jobTitle="Embedded Software Engineer"))
+
+    # Handling recommendation
     @Rule(Fact(action='find_job'), Fact(jobTitle=MATCH.job), salience=-998)
     def recommendJob(self, job):
         print("\nThe recommended job title for you is: " + job + "\n")
@@ -60,6 +87,7 @@ class JobRecommendation(KnowledgeEngine):
         print("Need more information to make a decision\n")
         global jobResult
         jobResult = "No suitable job title found"
+
 
 # ********************** MAIN PROGRAM ************************
 
@@ -78,7 +106,7 @@ def openResultWindow():
 
     windowRes = Tk()
     windowRes.title="Job Title Recommendation"
-    windowRes.iconphoto(False, PhotoImage(master=windowRes, file='/home/ameni/jobTitle_recommendation/icons/Job.png'))
+    windowRes.iconphoto(False, PhotoImage(master=windowRes, file='D:\Bureau\professionrecom\jobTitle_recommendation\icons\Job.png'))
     windowRes.maxsize(700, 500)
     windowRes.config(bg=backgroundvalue)
 
@@ -123,35 +151,35 @@ right_frame.grid(row=1, column=1, padx=20, pady=5, sticky="nsew")
 footerFrame = tk.Frame(root, width=600, height=150, bg=backgroundvalue)
 footerFrame.grid(row=2, column=0, padx=10, pady=5, sticky="nsew")
 
-# Skills input
+# Skills input using Combobox (with all skills from rules)
 groupe1 = Frame(left_frame, width=400, height=185, bg=bgFrames)
 groupe1.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe1, text="Skills", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 skills.set(None)
-Radiobutton(groupe1, text="Python", variable=skills, value="Python", bg=bgFrames, fg=optionsColor).grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-Radiobutton(groupe1, text="Leadership", variable=skills, value="Leadership", bg=bgFrames, fg=optionsColor).grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+skills_combobox = Combobox(groupe1, textvariable=skills, values=["Python", "Leadership", "Management", "Java", "Communication", "Cloud Computing", "Cybersecurity", "Embedded Systems", "Network Security", "AWS", "C++"], state="readonly")
+skills_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-# Interests input
+# Interests input using Combobox (with all interests from rules)
 groupe2 = Frame(left_frame, width=400, height=185, bg=bgFrames)
 groupe2.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe2, text="Interests", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 interests.set(None)
-Radiobutton(groupe2, text="Software Development", variable=interests, value="Software Development", bg=bgFrames, fg=optionsColor).grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-Radiobutton(groupe2, text="Data Science", variable=interests, value="Data Science", bg=bgFrames, fg=optionsColor).grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+interests_combobox = Combobox(groupe2, textvariable=interests, values=["Software Development", "Data Science", "Marketing", "Customer Support", "Backend Development", "Leadership", "Management", "Cloud Engineering", "Cybersecurity", "Embedded Engineering"], state="readonly")
+interests_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-# Academic Field input
+# Academic Field input using Combobox
 groupe3 = Frame(right_frame, width=400, height=185, bg=bgFrames)
 groupe3.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe3, text="Academic Field", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 academic_field.set(None)
-Radiobutton(groupe3, text="Computer Science", variable=academic_field, value="Computer Science", bg=bgFrames, fg=optionsColor).grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-Radiobutton(groupe3, text="Business", variable=academic_field, value="Business", bg=bgFrames, fg=optionsColor).grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+academic_field_combobox = Combobox(groupe3, textvariable=academic_field, values=["Computer Science", "Business"], state="readonly")
+academic_field_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-# Submit button
-submit_button = Button(footerFrame, text="Submit", width=30, height=2, bg=titleColor, fg="white", font=("arial", 10), relief="solid", command=openResultWindow)
-submit_button.grid(row=0, column=0, padx=5, pady=5)
+# Final button to trigger job recommendation
+submit_button = Button(footerFrame, text="Find Job", font=("arial", 12), bg=titleColor, fg="white", command=openResultWindow)
+submit_button.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
 root.mainloop()
