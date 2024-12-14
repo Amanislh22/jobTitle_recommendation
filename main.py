@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+from tkinter import messagebox
 from tkinter.ttk import Combobox
 from experta import *
 import random
@@ -11,6 +12,11 @@ jobResult = ""
 skills = StringVar()
 interests = StringVar()
 academic_field = StringVar()
+certification = StringVar()
+
+
+
+
 
 class JobRecommendation(KnowledgeEngine):
     @DefFacts()
@@ -31,51 +37,75 @@ class JobRecommendation(KnowledgeEngine):
     def jobAcademicField(self):
         self.declare(Fact(academic_field=academic_field.get()))
 
+    @Rule(Fact(action='find_job'), NOT(Fact(certification=W())), salience=1)
+    def jobCertification(self):
+        self.declare(Fact(certification=certification.get()))  # Récupère la certification si elle est fournie
+
+
     # ************ RULES *******************
 
-    # Example professions
-    @Rule(Fact(action='find_job'), Fact(skills="Python"), Fact(interests="Software Development"))
+    @Rule(Fact(action='find_job'), Fact(skills="Python"), Fact(interests="Software Development"), Fact(academic_field="Computer Science"))
     def r1(self):
         self.declare(Fact(jobTitle="Software Developer"))
 
-    @Rule(Fact(action='find_job'), Fact(skills="Leadership"), Fact(interests="Management"))
-    def r2(self):
-        self.declare(Fact(jobTitle="Project Manager"))
 
-    @Rule(Fact(action='find_job'), Fact(academic_field="Computer Science"), Fact(interests="Data Science"))
-    def r3(self):
-        self.declare(Fact(jobTitle="Data Scientist"))
+
 
     @Rule(Fact(action='find_job'), Fact(skills="Java"), Fact(interests="Backend Development"))
     def r4(self):
         self.declare(Fact(jobTitle="Backend Developer"))
 
-    # Additional rules for new professions
-    @Rule(Fact(action='find_job'), Fact(skills="Cloud Computing"), Fact(interests="Cloud Engineering"))
+    
+    @Rule(Fact(action='find_job'), Fact(skills="Python"), Fact(interests="Data Science"), Fact(academic_field="Computer Science"))
     def r5(self):
-        self.declare(Fact(jobTitle="Cloud Engineer"))
+        self.declare(Fact(jobTitle="Data Analyst"))
 
-    @Rule(Fact(action='find_job'), Fact(skills="Cybersecurity"), Fact(interests="Cybersecurity"))
+    @Rule(Fact(action='find_job'), Fact(skills="Leadership"), Fact(interests="Marketing"), Fact(academic_field="Business"))
     def r6(self):
-        self.declare(Fact(jobTitle="Cybersecurity Analyst"))
+        self.declare(Fact(jobTitle="Marketing Manager"))
 
-    @Rule(Fact(action='find_job'), Fact(skills="Embedded Systems"), Fact(interests="Embedded Engineering"))
+    @Rule(Fact(action='find_job'), Fact(skills="Communication"), Fact(interests="Customer Support"), Fact(academic_field="Business"))
     def r7(self):
-        self.declare(Fact(jobTitle="Embedded Engineer"))
+        self.declare(Fact(jobTitle="Customer Support Specialist"))
 
-    @Rule(Fact(action='find_job'), Fact(skills="Network Security"), Fact(interests="Cybersecurity"))
+    @Rule(Fact(action='find_job'), Fact(skills="Python"), Fact(interests="Software Development"), Fact(academic_field="Computer Science"))
     def r8(self):
-        self.declare(Fact(jobTitle="Network Security Engineer"))
+        self.declare(Fact(jobTitle="Full Stack Developer"))
 
-    @Rule(Fact(action='find_job'), Fact(skills="AWS"), Fact(interests="Cloud Engineering"))
-    def r9(self):
-        self.declare(Fact(jobTitle="Cloud Solutions Architect"))
+    @Rule(Fact(action='find_job'), Fact(skills="Security Analysis"), Fact(interests="Cybersecurity"), Fact(academic_field="Engineering"))
+    def r9(self): 
 
-    @Rule(Fact(action='find_job'), Fact(skills="C++"), Fact(interests="Embedded Engineering"))
-    def r10(self):
-        self.declare(Fact(jobTitle="Embedded Software Engineer"))
+        self.declare(Fact(jobTitle="Cybersecurity Specialist"))
 
-    # Handling recommendation
+   
+
+    @Rule(Fact(action='find_job'), Fact(skills="Microcontrollers"), Fact(interests="Embedded Systems"), Fact(academic_field="Engineering"))
+    def r11(self):
+        self.declare(Fact(jobTitle="Embedded Systems Engineer"))
+
+    @Rule(Fact(action='find_job'), Fact(skills="Networking"), Fact(interests="Network Administration"), Fact(academic_field="Computer Science"))
+    def r12(self):
+        self.declare(Fact(jobTitle="Network Engineer"))
+
+    @Rule(Fact(action='find_job'),Fact(certification="Cisco Certified Network Associate"), Fact(skills="networking"), Fact(interests="Network Administration"), Fact(academic_field="Engineering"))
+    def r13(self):
+        self.declare(Fact(jobTitle="Network Engineer"))
+    @Rule(Fact(action='find_job'), Fact(certification="Certified Ethical Hacker"), Fact(interests="Cybersecurity"), Fact(academic_field="Engineering"))
+    def r14(self):
+        self.declare(Fact(jobTitle="Ethical Hacker"))
+
+    @Rule(Fact(action='find_job'), Fact(certification="AWS Certified Solutions Architect"), Fact(interests="Cloud Computing"))
+    def r15(self):
+        self.declare(Fact(jobTitle="Cloud Architect"))
+
+    @Rule(Fact(action='find_job'), Fact(certification="Cisco Certified Network Associate"), Fact(interests="Network Administration"), Fact(academic_field="Engineering"))
+    def r16(self):
+        self.declare(Fact(jobTitle="Network Engineer"))
+
+    @Rule(Fact(action='find_job'),Fact(skills="Networking"), Fact(certification="Certified Information Systems Security Professional"), Fact(interests="Cybersecurity"), Fact(academic_field="Engineering"))
+    def r17(self):
+        self.declare(Fact(jobTitle="Security Architect"))
+
     @Rule(Fact(action='find_job'), Fact(jobTitle=MATCH.job), salience=-998)
     def recommendJob(self, job):
         print("\nThe recommended job title for you is: " + job + "\n")
@@ -151,22 +181,31 @@ right_frame.grid(row=1, column=1, padx=20, pady=5, sticky="nsew")
 footerFrame = tk.Frame(root, width=600, height=150, bg=backgroundvalue)
 footerFrame.grid(row=2, column=0, padx=10, pady=5, sticky="nsew")
 
-# Skills input using Combobox (with all skills from rules)
+# Skills input using Combobox
 groupe1 = Frame(left_frame, width=400, height=185, bg=bgFrames)
 groupe1.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe1, text="Skills", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 skills.set(None)
-skills_combobox = Combobox(groupe1, textvariable=skills, values=["Python", "Leadership", "Management", "Java", "Communication", "Cloud Computing", "Cybersecurity", "Embedded Systems", "Network Security", "AWS", "C++"], state="readonly")
+skills_combobox = Combobox(groupe1, textvariable=skills, 
+                           values=["Python", "Leadership", "Management", "Java", 
+                                   "Communication", "Security Analysis", "C++", 
+                                   "Microcontrollers", "Networking", "CCNA"], 
+                           state="readonly")
 skills_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-# Interests input using Combobox (with all interests from rules)
+# Interests input using Combobox
 groupe2 = Frame(left_frame, width=400, height=185, bg=bgFrames)
 groupe2.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe2, text="Interests", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 interests.set(None)
-interests_combobox = Combobox(groupe2, textvariable=interests, values=["Software Development", "Data Science", "Marketing", "Customer Support", "Backend Development", "Leadership", "Management", "Cloud Engineering", "Cybersecurity", "Embedded Engineering"], state="readonly")
+interests_combobox = Combobox(groupe2, textvariable=interests, 
+                              values=["Software Development", "Data Science", "Marketing", 
+                                      "Customer Support", "Backend Development", 
+                                      "Cybersecurity", "Embedded Systems", 
+                                      "Network Administration"], 
+                              state="readonly")
 interests_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
 # Academic Field input using Combobox
@@ -175,11 +214,27 @@ groupe3.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 Label(groupe3, text="Academic Field", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 academic_field.set(None)
-academic_field_combobox = Combobox(groupe3, textvariable=academic_field, values=["Computer Science", "Business"], state="readonly")
+academic_field_combobox = Combobox(groupe3, textvariable=academic_field, 
+                                   values=["Computer Science", "Business", 
+                                           "Engineering"], 
+                                   state="readonly")
 academic_field_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
-# Final button to trigger job recommendation
-submit_button = Button(footerFrame, text="Find Job", font=("arial", 12), bg=titleColor, fg="white", command=openResultWindow)
-submit_button.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+# Certifications input using Combobox
+groupe4 = Frame(right_frame, width=400, height=185, bg=bgFrames)
+groupe4.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+Label(groupe4, text="Certification", bg=bgFrames, fg=textColors, font=("arial", 12, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+
+certification.set(None)
+certification_combobox = Combobox(groupe4, textvariable=certification, 
+                                   values=["Certified Ethical Hacker", "AWS Certified Solutions Architect", 
+                                           "Cisco Certified Network Associate", 
+                                           "Certified Information Systems Security Professional"], 
+                                   state="readonly")
+certification_combobox.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+
+# Submit button
+submit_button = Button(footerFrame, text="Submit", width=30, height=2, bg=titleColor, fg="white", font=("arial", 10), relief="solid", command=openResultWindow)
+submit_button.grid(row=0, column=0, padx=5, pady=5)
 
 root.mainloop()
